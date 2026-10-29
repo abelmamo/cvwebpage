@@ -3,197 +3,317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Abel Demlie Mamo — Computer Vision</title>
+<title>Abel Demlie Mamo</title>
+<meta name="description" content="Abel Demlie Mamo: Computer Science and Brain and Cognitive Sciences at KAIST. Computer vision for microscopy.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,650;1,7..72,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #fafafa;
-    --text: #1a1a1a;
-    --muted: #5a5a5a;
-    --line: #e0e0e0;
-    --accent: #2b5fb0;
+    --paper: #f5f6f8;
+    --ink: #1a2030;
+    --muted: #586174;
+    --rule: #d8dce4;
+    --accent: #2f46c4;
+    --slide: #05070d;
+    --measure: 66ch;
+    --wide: 1000px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0f131b;
+      --ink: #e6e9ef;
+      --muted: #9aa3b5;
+      --rule: #273041;
+      --accent: #95a6ff;
+    }
   }
 
   * { box-sizing: border-box; }
-
+  html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Literata", Georgia, serif;
+    font-optical-sizing: auto;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    font-variant-numeric: lining-nums tabular-nums;
   }
+  a { color: var(--accent); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+  a:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
 
-  main {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 64px 24px 96px;
-  }
+  .page { max-width: var(--wide); margin: 0 auto; padding: 72px 24px 96px; }
+  .text { max-width: var(--measure); }
 
   header h1 {
-    font-size: 1.9em;
-    margin: 0 0 4px;
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 650;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
   }
+  header p { margin: 0 0 14px; font-size: 1.15rem; }
+  .links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 18px; }
 
-  header p.role {
-    color: var(--muted);
-    margin: 0 0 32px;
-    font-size: 1.05em;
-  }
-
-  section {
-    margin-bottom: 40px;
-  }
-
-  section h2 {
-    font-size: 0.85em;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-  }
-
-  p {
-    margin: 0 0 12px;
-  }
-
-  .project {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .project:last-child {
-    border-bottom: none;
-  }
-
-  .project h3 {
-    margin: 0 0 4px;
-    font-size: 1.05em;
-  }
-
-  .project a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  .project a:hover {
-    text-decoration: underline;
-  }
-
-  .project p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.95em;
-  }
-
-  .skills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .skills span {
-    border: 1px solid var(--line);
+  /* The compare slider: raw image underneath, segmentation on top, clipped. */
+  .scope { margin: 48px 0 0; }
+  .compare {
+    position: relative;
+    background: var(--slide);
     border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 0.9em;
-    color: var(--text);
+    overflow: hidden;
+    aspect-ratio: 696 / 520;
+    max-height: 640px;
+    margin: 0 auto;
   }
-
-  .contact a {
-    color: var(--accent);
-    text-decoration: none;
+  .compare img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: contain;
+    display: block;
+    image-rendering: auto;
   }
-
-  .contact a:hover {
-    text-decoration: underline;
+  .compare .seg { clip-path: inset(0 calc(100% - var(--split, 50%)) 0 0); }
+  .compare .handle {
+    position: absolute; top: 0; bottom: 0;
+    left: var(--split, 50%);
+    width: 2px; margin-left: -1px;
+    background: #ffffff;
+    pointer-events: none;
   }
-
-  footer {
-    color: var(--muted);
-    font-size: 0.85em;
-    margin-top: 48px;
+  .compare .handle::after {
+    content: ""; position: absolute; top: 50%; left: 50%;
+    width: 18px; height: 18px; margin: -9px 0 0 -9px;
+    border-radius: 50%; background: #ffffff;
   }
+  .compare .tag {
+    position: absolute; bottom: 12px;
+    color: #ffffff; font-size: 0.85rem;
+    background: rgba(5, 7, 13, 0.6);
+    padding: 2px 8px; border-radius: 3px;
+    pointer-events: none;
+  }
+  .compare .tag.left { left: 12px; }
+  .compare .tag.right { right: 12px; }
+  .compare input[type=range] {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    margin: 0; opacity: 0; cursor: ew-resize;
+  }
+  figcaption { color: var(--muted); font-size: 0.95rem; margin-top: 12px; max-width: var(--measure); }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #14161a;
-      --text: #e8e8e8;
-      --muted: #9a9a9a;
-      --line: #2b2e33;
-      --accent: #7aa7ff;
-    }
+  section { margin-top: 88px; }
+  h2 {
+    font-size: 1.6rem; font-weight: 650; letter-spacing: -0.01em;
+    margin: 0 0 8px; padding-bottom: 12px; border-bottom: 1px solid var(--rule);
+  }
+  .project { padding: 36px 0 8px; }
+  .project + .project { border-top: 1px solid var(--rule); }
+  h3 { font-size: 1.3rem; font-weight: 650; margin: 0 0 10px; line-height: 1.3; }
+  p { margin: 0 0 14px; }
+  .result { font-size: 1.15rem; }
+  .meta { color: var(--muted); font-size: 0.95rem; }
+
+  figure { margin: 22px 0 18px; }
+  figure img { width: 100%; height: auto; display: block; border-radius: 4px; border: 1px solid var(--rule); }
+  figure.narrow { max-width: 560px; }
+
+  table { border-collapse: collapse; margin: 18px 0 22px; font-size: 0.98rem; }
+  th, td { text-align: right; padding: 6px 0 6px 28px; border-bottom: 1px solid var(--rule); }
+  th:first-child, td:first-child { text-align: left; padding-left: 0; }
+  th { font-weight: 500; color: var(--muted); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.best { font-weight: 650; }
+
+  .minor { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px 40px; padding-top: 28px; border-top: 1px solid var(--rule); }
+  .minor h3 { font-size: 1.1rem; }
+
+  .entries { display: grid; grid-template-columns: 12rem 1fr; gap: 0 32px; }
+  .entries > div { padding: 22px 0; border-bottom: 1px solid var(--rule); }
+  .entries > div:nth-last-child(-n+2) { border-bottom: none; }
+  .when { color: var(--muted); font-size: 0.95rem; }
+  .entries h3 { font-size: 1.1rem; margin-bottom: 4px; }
+  .entries p { margin: 0; }
+  .entries .where { color: var(--muted); margin-bottom: 6px; }
+
+  footer { margin-top: 88px; color: var(--muted); font-size: 0.9rem; }
+
+  @media (max-width: 640px) {
+    .page { padding: 48px 16px 72px; }
+    .entries { grid-template-columns: 1fr; }
+    .entries > div:nth-child(odd) { border-bottom: none; padding-bottom: 0; }
+    .entries > div:nth-last-child(-n+2) { border-bottom: 1px solid var(--rule); }
+    .entries > div:last-child { border-bottom: none; }
+    th, td { padding-left: 14px; }
   }
 </style>
 </head>
 <body>
-<main>
+<main class="page">
+
   <header>
     <h1>Abel Demlie Mamo</h1>
-    <p class="role">Undergraduate Intern, BMOL Lab (KAIST) — Computer Vision</p>
+    <div class="text">
+      <p>I study Computer Science and Brain and Cognitive Sciences at KAIST, and I build computer vision models for microscopy.</p>
+      <p class="meta">Undergraduate researcher at the KAIST Biomedical Optics Lab (BMOL). Daejeon, South Korea.</p>
+      <div class="links">
+        <a href="https://github.com/abelmamo">GitHub</a>
+        <a href="mailto:abeldemliekaist@gmail.com">abeldemliekaist@gmail.com</a>
+        <a href="https://github.com/abelmamo/computer-vision-projects">Project code</a>
+      </div>
+    </div>
+
+    <figure class="scope">
+      <div class="compare" id="compare" style="--split: 50%">
+        <img src="assets/nuclei_raw.png" alt="Fluorescence microscopy image of cell nuclei from a held-out test set" width="696" height="520">
+        <img class="seg" src="assets/nuclei_segmented.png" alt="The same image with each nucleus my model found shown in its own color" width="696" height="520">
+        <div class="handle" aria-hidden="true"></div>
+        <span class="tag left" aria-hidden="true">Model output</span>
+        <span class="tag right" aria-hidden="true">Raw image</span>
+        <input type="range" min="0" max="100" value="50" aria-label="Compare the raw image with the model's segmentation">
+      </div>
+      <figcaption>A held-out image from the DSB2018 nuclei test set, which the model never saw in training. Drag across it to compare the raw image with my model's output: 223 nuclei found, against 257 in the ground truth.</figcaption>
+    </figure>
   </header>
 
-  <section>
-    <h2>About</h2>
-    <p>
-      I'm an undergraduate intern at the BMOL Lab at KAIST, where I work on
-      applying computer vision and deep learning to biomedical imaging —
-      analyzing microscopy data of living 3D structures such as stem cells
-      and organoids. Outside of that, I build and study general-purpose
-      computer vision projects to keep the fundamentals sharp.
-    </p>
+  <section aria-labelledby="work">
+    <h2 id="work">Selected work</h2>
+
+    <article class="project">
+      <h3>Nucleus instance segmentation</h3>
+      <div class="text">
+        <p>Counting and measuring cells starts with separating them, and a plain foreground mask merges nuclei that touch into one blob. My model is a U-Net that predicts two maps per image: where the nuclei are, and where two nuclei meet. A watershed step then uses the second map to split clusters into individual nuclei, and each nucleus is measured (area, shape, intensity) and exported to CSV.</p>
+        <p>With the usual 0.5 thresholds the watershed barely split anything, because the boundary map is faint inside merged blobs. I tuned the post-processing on held-out validation images (144 settings), which raised validation F1 from 0.771 to 0.847, and only then ran the test set once.</p>
+        <p class="result">On the 50 held-out test images (2,460 nuclei), the full pipeline reaches an F1 of 0.809 at IoU 0.5. The same model without the boundary map reaches 0.731, so the split step is where the gap comes from.</p>
+      </div>
+      <table>
+        <thead><tr><th scope="col">Test set, 50 images</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th></tr></thead>
+        <tbody>
+          <tr><td>Foreground mask only</td><td>0.800</td><td>0.672</td><td>0.731</td></tr>
+          <tr><td>With boundary map and watershed</td><td>0.829</td><td>0.790</td><td class="best">0.809</td></tr>
+        </tbody>
+      </table>
+      <figure>
+        <img src="assets/nuclei_examples.jpg" alt="Three crowded test images, each shown raw, with ground truth, with foreground-only results and with the full pipeline" loading="lazy">
+        <figcaption>The three most crowded test images. Foreground-only merges neighbors; the full pipeline separates most of them. Pixel Dice for the foreground mask is 0.926. Trained on CPU.</figcaption>
+      </figure>
+      <p class="meta">PyTorch, scikit-image. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/biomedical-cell-segmentation">Code and full results</a></p>
+    </article>
+
+    <article class="project">
+      <h3>CIFAR-10 classifier from scratch</h3>
+      <div class="text">
+        <p>A three-block convolutional network (620,810 parameters) trained from scratch in PyTorch with random crops and flips. The test set is only used for reporting, never for choosing a checkpoint.</p>
+        <p class="result">Final test accuracy: 80.8% on 10,000 images after 15 epochs. The hardest class is cat (58.6%), mostly confused with dogs.</p>
+      </div>
+      <figure class="narrow">
+        <img src="assets/cifar_confusion.png" alt="Confusion matrix of the classifier on the CIFAR-10 test set" loading="lazy">
+      </figure>
+      <p class="meta">PyTorch. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/image-classifier">Code and full results</a></p>
+    </article>
+
+    <article class="project">
+      <h3>Pill detection with a fine-tuned YOLOv8</h3>
+      <div class="text">
+        <p>COCO has no pill class, so I fine-tuned a pretrained YOLOv8n on the Ultralytics medical-pills dataset (92 training images, 23 for validation) for 50 epochs.</p>
+        <p class="result">Validation mAP50 0.994, mAP50-95 0.798, on 399 pills. The dataset has no separate test split, so these are validation numbers.</p>
+      </div>
+      <figure>
+        <img src="assets/pills_detected.jpg" alt="Blister packs of pills with a box drawn around each detected pill" loading="lazy">
+        <figcaption>A validation image: all 16 pills found.</figcaption>
+      </figure>
+      <p class="meta">Ultralytics YOLOv8, OpenCV. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/object-detection">Code and full results</a></p>
+    </article>
+
+    <div class="minor">
+      <div>
+        <h3><a href="https://github.com/abelmamo/computer-vision-projects/tree/master/image-segmentation">Binary U-Net</a></h3>
+        <p>The original single-mask U-Net the nucleus model grew out of, with Dice-based validation and overlay output.</p>
+      </div>
+      <div>
+        <h3><a href="https://github.com/abelmamo/computer-vision-projects/tree/master/face-detection-recognition">Face detection and recognition</a></h3>
+        <p>Haar-cascade detection plus embedding-based recognition against an enrolled set of people, for images or a webcam.</p>
+      </div>
+    </div>
+    <p class="meta text" style="margin-top: 24px;">The classification and segmentation code is covered by a small test suite that runs on every push through GitHub Actions.</p>
   </section>
 
-  <section>
-    <h2>Projects</h2>
+  <section aria-labelledby="experience">
+    <h2 id="experience">Experience</h2>
+    <div class="entries">
+      <div class="when">2026 to now</div>
+      <div>
+        <h3>Undergraduate researcher</h3>
+        <p class="where">Biomedical Optics Lab (BMOL), KAIST</p>
+        <p>Computer vision and deep learning for biomedical imaging, working with microscopy data of living 3D structures such as stem cells and organoids.</p>
+      </div>
 
-    <div class="project">
-      <h3><a href="https://github.com/abelmamo/computer-vision-projects/tree/master/image-classifier">Image Classifier</a></h3>
-      <p>CNN trained from scratch on CIFAR-10, built in PyTorch.</p>
+      <div class="when">2026 to now</div>
+      <div>
+        <h3>Student assistant</h3>
+        <p class="where">International Scholar and Student Services, KAIST</p>
+        <p>Part-time student assistant at the university's office for international students and scholars.</p>
+      </div>
+
+      <div class="when">At KAIST</div>
+      <div>
+        <h3>Peer tutor in General Biology</h3>
+        <p class="where">KAIST</p>
+        <p>Informally tutor first-year Ethiopian students at KAIST through General Biology, a course I finished with an A+. Before university I taught students at my high school and in district public schools in Ethiopia.</p>
+      </div>
+
+      <div class="when">At KAIST</div>
+      <div>
+        <h3>Student ambassador, Here Comes KAIST</h3>
+        <p class="where">Addis Ababa, Ethiopia</p>
+        <p>Ran a KAIST information session for students at a high school in Addis Ababa.</p>
+      </div>
+
+      <div class="when">Before KAIST</div>
+      <div>
+        <h3>International student support</h3>
+        <p class="where">University of Cassino, Italy</p>
+        <p>Helped new international students with language and settling into the city, ran biweekly sessions to collect their concerns, and organized community events.</p>
+      </div>
     </div>
-
-    <div class="project">
-      <h3><a href="https://github.com/abelmamo/computer-vision-projects/tree/master/object-detection">Object Detection</a></h3>
-      <p>YOLOv8-based detection with a fine-tuning pipeline for custom datasets.</p>
-    </div>
-
-    <div class="project">
-      <h3><a href="https://github.com/abelmamo/computer-vision-projects/tree/master/image-segmentation">Image Segmentation</a></h3>
-      <p>U-Net implemented from scratch in PyTorch for binary mask prediction.</p>
-    </div>
-
-    <div class="project">
-      <h3><a href="https://github.com/abelmamo/computer-vision-projects/tree/master/face-detection-recognition">Face Detection &amp; Recognition</a></h3>
-      <p>OpenCV-based detection paired with embedding-based face recognition.</p>
-    </div>
-
-    <p style="margin-top: 16px;">
-      Full code for all of these: <a href="https://github.com/abelmamo/computer-vision-projects">github.com/abelmamo/computer-vision-projects</a>
-    </p>
   </section>
 
-  <section>
-    <h2>Skills</h2>
-    <div class="skills">
-      <span>Python</span>
-      <span>PyTorch</span>
-      <span>OpenCV</span>
-      <span>MATLAB</span>
-      <span>Computer Vision</span>
-      <span>Deep Learning</span>
+  <section aria-labelledby="education">
+    <h2 id="education">Education</h2>
+    <div class="entries">
+      <div class="when">2025 to now</div>
+      <div>
+        <h3>KAIST</h3>
+        <p class="where">B.S. in Computer Science, double major in Brain and Cognitive Sciences. School of Computing Scholarship.</p>
+        <p>Data Structures (Java), Discrete Mathematics, Linear Algebra, C programming and Unix tools, Machine Learning, Probability and Statistics, Biology of Neurons, Cognitive Neuroscience, Systems Neuroscience, Disorders and Diseases of the Nervous System, The Computer and the Mind.</p>
+      </div>
+
+      <div class="when">Before KAIST</div>
+      <div>
+        <h3>University of Cassino</h3>
+        <p class="where">Cassino, Italy. Six months of study.</p>
+      </div>
     </div>
   </section>
 
-  <section class="contact">
-    <h2>Contact</h2>
-    <p>Email: <a href="mailto:abeldemliekaist@gmail.com">abeldemliekaist@gmail.com</a></p>
-    <p>GitHub: <a href="https://github.com/abelmamo">github.com/abelmamo</a></p>
+  <section aria-labelledby="skills">
+    <h2 id="skills">Tools</h2>
+    <p class="text">Python, PyTorch, scikit-image, OpenCV, Ultralytics YOLO, NumPy, matplotlib, pytest. Java and C. Git, GitHub Actions, Linux. MATLAB.</p>
   </section>
 
-  <footer>
-    Last updated 2026.
-  </footer>
+  <footer>Updated October 2026.</footer>
 </main>
+
+<script>
+  (function () {
+    var box = document.getElementById("compare");
+    var range = box.querySelector("input");
+    function set(v) { box.style.setProperty("--split", v + "%"); }
+    range.addEventListener("input", function () { set(range.value); });
+    set(range.value);
+  })();
+</script>
 </body>
 </html>
