@@ -227,6 +227,42 @@
       <p class="meta">Ultralytics YOLOv8, OpenCV. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/object-detection">Code and full results</a></p>
     </article>
 
+    <article class="project">
+      <h3>Quantitative phase imaging: cell dry mass from holograms</h3>
+      <div class="text">
+        <p>Living cells are nearly transparent, but they delay the light that passes through them, and that delay is proportional to their protein content. I wrote the reconstruction that turns an off-axis hologram into a phase map: filter the side lobe in Fourier space, divide by a background hologram to cancel the microscope's aberrations, unwrap, level, then segment the cells and integrate their phase into dry mass.</p>
+        <p>The holograms are simulated, with aberrations, beam drift and camera noise, so the true phase and mass of every cell are known. The window radius is chosen on separate calibration fields at each light level, and removing any one step of the pipeline breaks it.</p>
+        <p class="result">On 20 test fields (200 cells) at 1000 photons per pixel: phase error 0.025 rad RMS, every cell found, and a median dry-mass error of 0.23%. Without the background hologram, the error rises to 1.39 rad and only 10 cells are found.</p>
+      </div>
+      <figure>
+        <img src="assets/qpi_reconstruction.jpg" alt="A simulated hologram, its spectrum, the uncorrected phase, the reconstructed phase, the true phase and the error map" loading="lazy">
+        <figcaption>One test field: the raw hologram fringes, the spectrum with the filter window, the phase before correction, my reconstruction, the truth and the error, which stays on the cell edges.</figcaption>
+      </figure>
+      <p class="meta">NumPy, SciPy, scikit-image. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/quantitative-phase-imaging">Code and full results</a></p>
+    </article>
+
+    <article class="project">
+      <h3>Calcium imaging: from two-photon movies to spikes</h3>
+      <div class="text">
+        <p>A pipeline for the kind of data systems neuroscience runs on: correct the brain's motion, find neurons by how their pixels fluctuate together rather than how bright they are, subtract the surrounding neuropil, and infer when each neuron fired. For the last step I compared OASIS deconvolution with a small 1D CNN trained on separate movies.</p>
+        <p>The movies are simulated (ring-shaped somata, bursts, neuropil, bleaching, motion and photon noise), with separate seeds for training, calibration and testing.</p>
+        <p class="result">On 10 test movies (400 neurons): motion error 0.077 px, neuron detection F1 0.835 from the correlation image against 0.718 from the mean image, and spike F1 0.946 for the CNN against 0.849 for OASIS. The CNN was trained on the same simulator, so on real data the gap would be smaller.</p>
+      </div>
+      <table>
+        <thead><tr><th scope="col">Spike inference, 363 neurons</th><th scope="col">Precision</th><th scope="col">Recall</th><th scope="col">F1</th></tr></thead>
+        <tbody>
+          <tr><td>Threshold on the rise</td><td>0.937</td><td>0.770</td><td>0.845</td></tr>
+          <tr><td>OASIS deconvolution</td><td>0.904</td><td>0.801</td><td>0.849</td></tr>
+          <tr><td>1D CNN</td><td>0.948</td><td>0.944</td><td class="best">0.946</td></tr>
+        </tbody>
+      </table>
+      <figure>
+        <img src="assets/calcium_detection.jpg" alt="The same field of neurons on the mean image and on the correlation image, with detected and missed neurons marked" loading="lazy">
+        <figcaption>Detection on one test movie: 29 of 40 neurons from the mean image, 36 of 40 from the correlation image.</figcaption>
+      </figure>
+      <p class="meta">NumPy, SciPy, scikit-image, PyTorch. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/calcium-imaging-analysis">Code and full results</a></p>
+    </article>
+
     <div class="minor">
       <div>
         <h3><a href="https://github.com/abelmamo/computer-vision-projects/tree/master/image-segmentation">Binary U-Net</a></h3>
@@ -237,7 +273,7 @@
         <p>Haar-cascade detection plus embedding-based recognition against an enrolled set of people, for images or a webcam.</p>
       </div>
     </div>
-    <p class="meta text" style="margin-top: 24px;">The classification and segmentation code is covered by a small test suite that runs on every push through GitHub Actions.</p>
+    <p class="meta text" style="margin-top: 24px;">The classification, segmentation, phase imaging and calcium imaging code is covered by a small test suite that runs on every push through GitHub Actions.</p>
   </section>
 
   <section aria-labelledby="experience">
@@ -300,10 +336,10 @@
 
   <section aria-labelledby="skills">
     <h2 id="skills">Tools</h2>
-    <p class="text">Python, PyTorch, scikit-image, OpenCV, Ultralytics YOLO, NumPy, matplotlib, pytest. Java and C. Git, GitHub Actions, Linux. MATLAB.</p>
+    <p class="text">Python, PyTorch, NumPy, SciPy, scikit-image, OpenCV, Ultralytics YOLO, matplotlib, pytest. Java and C. Git, GitHub Actions, Linux. MATLAB.</p>
   </section>
 
-  <footer>Updated October 2026.</footer>
+  <footer>Updated November 2026.</footer>
 </main>
 
 <script>
