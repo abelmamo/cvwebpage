@@ -242,6 +242,33 @@
     </article>
 
     <article class="project">
+      <h3>Holotomography: a cell's 3D refractive index</h3>
+      <div class="text">
+        <p>One phase image only gives the refractive index summed through the cell. Illuminating from many angles and combining the views separates the cytoplasm, nucleus, nucleoli and lipid droplets in 3D, without labels. I implemented the reconstruction: the Rytov approximation for each angle, the Fourier diffraction theorem to place every view on its Ewald cap in 3D Fourier space, and Gerchberg-Papoulis iterations that use a physical constraint (no part of a cell is optically thinner than its medium) to fill the "missing cone" the objective cannot see.</p>
+        <p>The test data come from a multi-slice beam propagation simulation that includes diffraction and multiple scattering, which the reconstruction does not assume, so it is not tested against its own model. The iteration count is chosen on separate calibration cells: about 10 iterations fill the cone, while more start fitting noise.</p>
+        <p class="result">On 8 test cells with 49 angles: RI error 0.0049, against 0.0083 for direct Rytov inversion and 0.0112 for the Born approximation. Direct inversion leaves 28% of the cell's dry mass smeared above and below it; with the constraint, 95.5% is back in place.</p>
+      </div>
+      <figure>
+        <img src="assets/holotomography_slices.jpg" alt="True and reconstructed refractive index of a simulated cell, in xy and xz slices, for Born, Rytov and Rytov with the non-negativity constraint" loading="lazy">
+        <figcaption>xy and xz slices of one test cell. The direct reconstructions are stretched along the optical axis (bottom row); the constrained one restores the cell's shape and density.</figcaption>
+      </figure>
+      <p class="meta">NumPy, SciPy, scikit-image. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/holotomography">Code and full results</a></p>
+    </article>
+
+    <article class="project">
+      <h3>Virtual staining: nuclei from label-free images</h3>
+      <div class="text">
+        <p>A U-Net that reads a phase image of unlabeled cells and predicts what a DNA stain would show, so nuclei can be found without dyes. The simulated pairs are built so that phase alone is ambiguous: nuclei can match their cytoplasm's refractive index, lipid droplets are bright in phase but hold no DNA, and some cells are dividing.</p>
+        <p class="result">On 200 test images (1,242 nuclei), segmenting the virtual stain finds nuclei with F1 0.993, against 0.995 from the real stain and 0.245 from a linear prediction. The prediction correlates 0.826 with the true stain: it places the DNA correctly, but cannot recover chromatin texture that the phase image does not contain.</p>
+      </div>
+      <figure>
+        <img src="assets/virtual_staining.jpg" alt="Phase images, real stains, virtual stains and the nuclei found, for two test images" loading="lazy">
+        <figcaption>Two test images. The virtual stain finds every nucleus, including dividing cells, but renders them smoother than the real stain.</figcaption>
+      </figure>
+      <p class="meta">PyTorch, scikit-image. <a href="https://github.com/abelmamo/computer-vision-projects/tree/master/virtual-staining">Code and full results</a></p>
+    </article>
+
+    <article class="project">
       <h3>Calcium imaging: from two-photon movies to spikes</h3>
       <div class="text">
         <p>A pipeline for the kind of data systems neuroscience runs on: correct the brain's motion, find neurons by how their pixels fluctuate together rather than how bright they are, subtract the surrounding neuropil, and infer when each neuron fired. For the last step I compared OASIS deconvolution with a small 1D CNN trained on separate movies.</p>
@@ -273,7 +300,7 @@
         <p>Haar-cascade detection plus embedding-based recognition against an enrolled set of people, for images or a webcam.</p>
       </div>
     </div>
-    <p class="meta text" style="margin-top: 24px;">The classification, segmentation, phase imaging and calcium imaging code is covered by a small test suite that runs on every push through GitHub Actions.</p>
+    <p class="meta text" style="margin-top: 24px;">The classification, segmentation, phase imaging, holotomography, virtual staining and calcium imaging code is covered by a small test suite that runs on every push through GitHub Actions.</p>
   </section>
 
   <section aria-labelledby="experience">
